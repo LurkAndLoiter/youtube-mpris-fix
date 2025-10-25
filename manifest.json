@@ -12,7 +12,7 @@
     "*://music.youtube.com/*"
   ],
   "background": {
-    "scripts": ["background.js"]
+    "servicer_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -20,7 +20,9 @@
         "*://www.youtube.com/*",
         "*://music.youtube.com/*"
       ],
-      "js": ["content.js"],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_idle"
     }
   ],
@@ -31,4 +33,3 @@
     }
   }
 }
-

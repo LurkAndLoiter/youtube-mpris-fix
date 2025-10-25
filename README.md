@@ -71,7 +71,7 @@ If you want to load the extension for development or inspect the code:
 > This is not a functional issue.
 > If you want you can fix this by altering manifest.json to be manifest v3 compliant. *this will break compatibility with firefox*
 >
-> ```diff 
+> ```diff
 > - "scripts": ["background.js"]
 > + "service_worker": "background.js"
 > ```

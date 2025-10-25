@@ -1,81 +1,101 @@
 /**
  * @file content.js
- * @description This script runs directly on the YouTube/YouTube Music page. It finds the video
- * player and forces a metadata update for MPRIS whenever a new video is loaded.
+ * @description Fixes YouTube/YouTube Music MPRIS metadata updates on video
+ * load.
  */
-VERSION = 1.2
-console.log("Youtube MPRIS Fixer: Content script loaded. Version " + VERSION);
+const VERSION = 1.2;
+console.log(`Youtube MPRIS Fixer: Content script loaded. Version ${VERSION}`);
 
-// youtube vid
 let videoElement = null;
 
 /**
- * Finds the main video element on the page.
+ * Finds the main video element.
  * @returns {HTMLVideoElement|null}
  */
 function findVideoElement() {
-    return document.querySelector('video');
-}
-
-function updateMediaSession() {
-    if (!('mediaSession' in navigator) || !videoElement) return;
-
-    if (!isNaN(videoElement.duration)) {
-        navigator.mediaSession.setPositionState({
-            duration: videoElement.duration
-        });
-    }
+  const selectors = [ 'video', '.html5-main-video', '#movie_player video' ];
+  for (const selector of selectors) {
+    const element = document.querySelector(selector);
+    if (element instanceof HTMLVideoElement)
+      return element;
+  }
+  return null;
 }
 
 /**
- * Attaches all necessary event listeners to the video element.
+ * Updates media session metadata.
+ */
+function updateMediaSession() {
+  if (!('mediaSession' in navigator) || !videoElement) return;
+  if (!isNaN(videoElement.duration)) {
+    navigator.mediaSession.setPositionState({duration : videoElement.duration});
+  }
+}
+
+/**
+ * Attaches event listener to the video element. Ensures single attachment.
  */
 function attachVideoListeners() {
-    if (!videoElement) return;
-    const masterListener = () => updateMediaSession();
-    videoElement.removeEventListener('durationchange', masterListener);
-    videoElement.addEventListener('durationchange', masterListener);
-    console.log("MPRIS Fixer: All video event listeners attached.");
+  if (!videoElement || videoElement.dataset.listenersAttached)
+    return;
+  const masterListener = () => updateMediaSession();
+  videoElement.addEventListener('durationchange', masterListener);
+  videoElement.dataset.listenersAttached = 'true';
+  console.log("MPRIS Fixer: Video event listeners attached.");
 }
 
 /**
- * Initializes the entire script. Finds the video element, sets up observers and listeners.
+ * Clears stale video element reference and re-initializes.
+ */
+function resetAndInitialize() {
+  videoElement = null;
+  initialize();
+}
+
+/**
+ * Initializes the script, finding the video element and setting up listeners.
  */
 function initialize() {
-    videoElement = findVideoElement();
-    if (videoElement) {
-        console.log("Youtube MPRIS Fixer: Video element found. Initializing...");
-        attachVideoListeners();
-        updateMediaSession(); // Initial update
-    }else {
-        // If the video element isn't ready, wait and try again.
-        console.log("Youtube MPRIS Fixer: Video element not found. Retrying...");
-        setTimeout(initialize, 1000);
-    }
+  videoElement = findVideoElement();
+  if (videoElement) {
+    console.log("Youtube MPRIS Fixer: Video element found. Initializing...");
+    attachVideoListeners();
+    updateMediaSession();
+  } else {
+    console.log("Youtube MPRIS Fixer: Video element not found. Retrying...");
+    setTimeout(initialize, 1000);
+  }
 }
 
 /**
- * A master MutationObserver to watch for major page changes, like the player being
- * added to the DOM on navigation. This is more reliable than observing the title.
+ * Watches for DOM changes to detect video player additions or updates.
  */
 const pageObserver = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-        for (const node of mutation.addedNodes) {
-            if (node.nodeType === 1 && (node.querySelector('video') || node.matches('video'))) {
-                console.log("Youtube MPRIS Fixer: Video player detected in DOM change. Re-initializing.");
-                initialize();
-                return;
-            }
-        }
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (node.nodeType === 1 && (node.querySelector('video') ||
+                                  node.matches('video, #movie_player'))) {
+        console.log(
+            "Youtube MPRIS Fixer: Video player detected in DOM change. Re-initializing.");
+        resetAndInitialize();
+        return;
+      }
     }
+    if (mutation.type === 'attributes' &&
+        mutation.target.matches('#movie_player, .html5-video-player')) {
+      console.log(
+          "Youtube MPRIS Fixer: Player attribute change detected. Re-initializing.");
+      resetAndInitialize();
+      return;
+    }
+  }
 });
 
-// Start observing the entire document for changes.
 pageObserver.observe(document.body, {
-    childList: true,
-    subtree: true
+  childList : true,
+  subtree : true,
+  attributes : true,
+  attributeFilter : [ 'class', 'src' ]
 });
 
-// Initial call to start the process.
 initialize();
-
