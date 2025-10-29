@@ -1,0 +1,9 @@
+{
+    "name": "mpris_helper",
+    "description": "playerctl status listener to seek back 1s on playing status.",
+    "path": "blank",
+    "type": "stdio",
+    "allowed_origins": [
+        "chrome-extension://falnbbnoedijbjbkkjdoehijlehhfiff/"
+    ]
+}

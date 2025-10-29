@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "youtube_mpris_patch",
+  "version": "1.0",
+  "description": "MPRIS seeks back 5 seconds when youtube videos start playing. This is bug patch to force an MPRIS data update on youtube player.",
+  "permissions": ["scripting", "tabs", "nativeMessaging"],
+  "background": { "service_worker": "background.js" },
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "*://music.youtube.com/*"
+  ]
+}
