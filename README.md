@@ -12,6 +12,7 @@ Tested on:
 - Opera
 
 *This should be compatible with any chromium browser see Manual install if not listed else, install.sh works*
+
 *If you'd like a chromium browser supported that is not currently please open an issue about it.*
 
 There is a [firefox solution](https://github.com/d1BG/youtube-mpris-fix) by @D1BG.
@@ -22,7 +23,8 @@ YouTube is a Single-Page Application (SPA). It loads new videos dynamically with
 
 ## The Solution
 
-~Listen for play events on video element and simulate a left click to seek back 5 seconds.~ *Seeking updates MPRIS.*
+*Seeking updates MPRIS.*
+
 create a native messaging host call that creates a socket listener for the browser's MPRIS player status and call a host machine MPRIS seek 1- on status Playing.
 
 > [!NOTE]
