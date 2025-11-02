@@ -49,7 +49,7 @@ create a native messaging host call that creates a socket listener for the brows
 
 ## Manual install because who would trust install.sh?
 
-There are two files that need to be altered and moved into the browsers $HOME/.config/YOURCHROMIUMBROWSER/Native/Messaging/Hosts/ folder:
+There are two files that need to be altered and moved into the browsers $HOME/.config/YOURCHROMIUMBROWSER/NativeMessagingHosts/ folder:
 
 - mpris_helper.json
   - alteration: Change `"path": "blank"` to be `"path": "/root/fullfromroottoscript/pathof/mpris_helper.sh"`
