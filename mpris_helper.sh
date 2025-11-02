@@ -1,18 +1,22 @@
 #!/bin/bash
 browser=blank
 readmsg() {
-    local i n len=0;
-    for ((i=0;i<4;i++)); do
-        read -r -d '' -n 1;
-        printf -v n %d "'$REPLY";
-        ((len+=n<<i*8));
-    done;
-    read -r -N "$len" && msg=$REPLY;
+  local i n len=0;
+  for ((i=0;i<4;i++)); do
+    read -r -d '' -n 1;
+    printf -v n %d "'$REPLY";
+   ((len+=n<<i*8));
+  done;
+  read -r -N "$len" && msg=$REPLY;
 }
 sendmsg() {
-    printf -v x %08X "${#1}";
-    printf %b "\x${x:6:2}\x${x:4:2}\x${x:2:2}\x${x:0:2}";
-    printf %s "$1";
+  printf -v x %08X "${#1}";
+  printf %b "\x${x:6:2}\x${x:4:2}\x${x:2:2}\x${x:0:2}";
+  printf %s "$1";
+}
+cleanup() {
+  pgrep -f "playerctl --player=$browser status --follow" | xargs kill -9
+  exit
 }
 while readmsg; do
   case "$msg" in
@@ -30,7 +34,9 @@ while readmsg; do
       fi
       sendmsg '{"status":"ok"}' ;;
     '{"action":"stop"}')
-      pkill -f "playerctl --player=$browser status --follow"
-      sendmsg '{"status":"ok"}' && exit 0 ;;
+      sendmsg '{"status":"ok"}'
+      cleanup ;;
   esac
 done
+
+cleanup
