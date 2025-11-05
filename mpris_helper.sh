@@ -1,5 +1,6 @@
 #!/bin/bash
 browser=blank
+
 readmsg() {
   local i n len=0;
   for ((i=0;i<4;i++)); do
@@ -9,15 +10,18 @@ readmsg() {
   done;
   read -r -N "$len" && msg=$REPLY;
 }
+
 sendmsg() {
   printf -v x %08X "${#1}";
   printf %b "\x${x:6:2}\x${x:4:2}\x${x:2:2}\x${x:0:2}";
   printf %s "$1";
 }
+
 cleanup() {
-  pgrep -f "playerctl --player=$browser status --follow" | xargs kill -9
+  pgrep -f "playerctl --player=$browser status --follow" | xargs kill
   exit
 }
+
 while readmsg; do
   case "$msg" in
     '{"action":"start"}')
@@ -26,8 +30,11 @@ while readmsg; do
           while read -r status; do
             case $status in
               Playing) playerctl --player="$browser" position 1- ;;
-              Paused | Stopped) continue ;;
-              *) exit ;;
+              Paused|Stopped) continue ;;
+              *)
+                # playerctl crashes and ungraceful browser closures
+                pgrep -f "playerctl --player=$browser status --follow" | xargs kill
+                exit ;;
             esac
           done
         }
