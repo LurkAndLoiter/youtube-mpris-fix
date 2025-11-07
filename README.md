@@ -58,29 +58,24 @@ Create a native messaging host call that creates a socket listener for the brows
 
 1. Clone or download this repository.
 
-2. Navigate to the repositories directory and run the install.sh(see Manual install if you don't trust this.).
+2. Navigate to the repositories directory and run the install.sh(see Manual install if you prefer not to run this.).
 
 > **TEMPORARY INSTALL**
 > 
 > 3. In Firefox, navigate to`about:debugging`
 > 4. Click on `This Firefox` on the left
 > 5. Click the `Load Temporary Add-on...` button
-> 6. Select the `firefoxpkg.zip` inside the `youtube-mpris-fixer` directory
+> 6. Select the `mpris_youtube_fix.xpi` inside the `youtube-mpris-fix` directory
 > 7. The extension will be active until you close Firefox or disable the extension.
 
-> **PERMANENT INSTALL** *Doesn't work on base Firefox see note 1*
+> **PERMANENT INSTALL**
 > 
-> 3. In Firefox, navigate to `about:config`
-> 4. Set `xpinstall.signatures.required` to `false`
-> 5. Navigate to `about:addons`
-> 6. Click the settings cog wheel `Tools for all add-ons` in the top right.
-> 7. Click "Install Add-on From File"
-> 8. Select the `firefoxpkg.zip`
-> 9. Click `add` on the pop-up *see note 2 for permissions overview*
-> 10. The extension will be active until you remove or disable it.
- 
-> [!NOTE]
-> The permanent install does not work on base Firefox but will work on Dev Nightly and derivatives like LibreWolf and Zen. This is a Mozilla decision and would require submitting the add-on for signing to resolve. At the moment, I do not consider it tested or complete thus signing will be postponed.
+> 3. In Firefox, navigate to `about:addons`
+> 4. Click the settings cog wheel `Tools for all add-ons` in the top right.
+> 5. Click "Install Add-on From File"
+> 6. Select the `mpris_youtube_fix.xpi`
+> 7. Click `add` on the pop-up *see note for permissions overview*
+> 8. The extension will be active until you remove or disable it.
  
 > [!NOTE]
 > #### Permissions pop-up
@@ -109,7 +104,7 @@ Edit the following files before installing:
 
 ## FAQ
 
-### What is in firefoxpkg.zip?
+### What is in mpris_youtube_fix.xpi?
 - Firefox compliant manifest.json
   - service_worker → scripts
   - add browser specific section to declare app id.
