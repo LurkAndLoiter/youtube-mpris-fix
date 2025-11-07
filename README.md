@@ -1,6 +1,6 @@
-# Chromium YouTube MPRIS Patch
+# YouTube MPRIS Fix
 
-A Chromium Youtube patch addressing MPRIS metadata bugs on YouTube and YouTube Music
+A browser/host fix addressing MPRIS metadata bugs on YouTube and YouTube Music
 
 Tested on:
 
@@ -10,32 +10,39 @@ Tested on:
 - Vivaldi
 - Microsoft Edge
 - Opera
+- Firefox
+- Librewolf
+- Zen
 
-*This should be compatible with any chromium browser see Manual install if not listed else, install.sh works*
+*This should be compatible with any Chromium or Firefox browser. If your browser is not listed, see Manual install; otherwise, install.sh should work*
 
-*If you'd like a chromium browser supported that is not currently please open an issue about it.*
+*If you'd like a browser supported that is not currently please open an issue about it.*
 
-There is a [firefox solution](https://github.com/d1BG/youtube-mpris-fix) by @D1BG.
+---
 
 ## The Problem
 
-YouTube is a Single-Page Application (SPA). It loads new videos dynamically without a full page refresh. This often means MPRIS fails to notice updates.
+YouTube is a Single-Page Application (SPA) that loads new videos dynamically without a full page refresh. Because of this, MPRIS often does not detect video changes and metadata updates.
 
 ## The Solution
 
 *Seeking updates MPRIS.*
 
-create a native messaging host call that creates a socket listener for the browser's MPRIS player status and call a host machine MPRIS seek 1- on status Playing.
+Create a native messaging host call that creates a socket listener for the browser's MPRIS player status and call a host machine MPRIS seek 1- on status Playing.
 
 > [!NOTE]
-> Ideally we would set position to the current position. Unfortunately position is an element that is unreliable due to SPA; thus the least invasive fix is to always seek back 0 seconds (youtube does not support a seconds argument and thus will default to 5 seconds)
+> Ideally, we would set position to the current position. Unfortunately, position is an element that is unreliable due to SPA; thus, the least invasive fix is to always seek back 0 seconds (Youtube does not support a seconds argument and thus will default to 5 seconds)
 > If it's the beginning of a video, this seeks to 0 else, it'll resume play 5s back from the current real player position.
+
+---
 
 ## Installation:
 
+### Chromium
+
 1. Clone or download this repository.
 
-2. navigate to the repositories directory and run the install.sh(see below section if you don't trust this.).
+2. Navigate to the repositories directory and run the install.sh(see Manual install if you don't trust this.).
 
 3. Open browser and go to `chrome://extensions` (or `yourbrowser://extensions`).
 
@@ -47,21 +54,73 @@ create a native messaging host call that creates a socket listener for the brows
 
 7. The extension should appear in the extensions list; reload the extension if you make alterations.
 
-## Manual install because who would trust install.sh?
+### Firefox
 
-There are two files that need to be altered and moved into the browsers `$HOME/.config/YOURCHROMIUMBROWSER/NativeMessagingHosts/` folder:
+1. Clone or download this repository.
 
+2. Navigate to the repositories directory and run the install.sh(see Manual install if you don't trust this.).
+
+> **TEMPORARY INSTALL**
+> 
+> 3. In Firefox, navigate to`about:debugging`
+> 4. Click on `This Firefox` on the left
+> 5. Click the `Load Temporary Add-on...` button
+> 6. Select the `firefoxpkg.zip` inside the `youtube-mpris-fixer` directory
+> 7. The extension will be active until you close Firefox or disable the extension.
+
+> **PERMANENT INSTALL** *Doesn't work on base Firefox see note 1*
+> 
+> 3. In Firefox, navigate to `about:config`
+> 4. Set `xpinstall.signatures.required` to `false`
+> 5. Navigate to `about:addons`
+> 6. Click the settings cog wheel `Tools for all add-ons` in the top right.
+> 7. Click "Install Add-on From File"
+> 8. Select the `firefoxpkg.zip`
+> 9. Click `add` on the pop-up *see note 2 for permissions overview*
+> 10. The extension will be active until you remove or disable it.
+ 
+> [!NOTE]
+> The permanent install does not work on base Firefox but will work on Dev Nightly and derivatives like LibreWolf and Zen. This is a Mozilla decision and would require submitting the add-on for signing to resolve. At the moment, I do not consider it tested or complete thus signing will be postponed.
+ 
+> [!NOTE]
+> #### Permissions pop-up
+> - **Exchange messages with programs other than $browser**
+>   - This is regarding using a host script.
+>   - See mpris_helper.json and mpris_helper.sh
+> - **Access browser tabs**
+>   - Tracks tabs for url *youtube.com/*
+>   - See background.js
+
+## Manual install (for users who prefer not to run install.sh)
+
+You must install two files to the native mesaging host directory for your browser:
+- Chromium-based: `$HOME/.config/YOURCHROMIUMBROWSER/NativeMessagingHosts/`
+- Firefox-based: `$HOME/.YOURFIREFOXBROWSER/native-messaging-hosts/`
+
+Edit the following files before installing:
 - mpris_helper.json
   - alteration: Change `"path": "blank"` to be `"path": "/root/fullfromroottoscript/pathof/mpris_helper.sh"`
 - mpris_helper.sh
   - alteration: Change `browser=blank` to `browser=BrowserplayerctlNAME`
-  - for the playerctl name exclude any `.instance12345` you just want `brave`, `chromium`, etc
+  - for the playerctl name exclude any `.instance12345` just use `brave`, `chromium`, etc
   - **DO NOT** quote the BrowserplayerctlName do not use `browser="chromium"` or `browser='chromium'` just write `browser=chromium`
 
-## How does it work?
+ ---
+
+## FAQ
+
+### What is in firefoxpkg.zip?
+- Firefox compliant manifest.json
+  - service_worker → scripts
+  - add browser specific section to declare app id.
+- Firefox compliant background.json
+  - chrome.* → browser.*
+- MIT License copy
+
+### How does it work?
 
 - install.sh see manual install; this is roughly what the script attempts to accomplish
 - background.js monitors tabs for `youtube.com` if one exists, it sends a start message to our native host. When all Youtube tabs are closed or when the browser is suspended, it will send a stop message to our native host.
-- mpris_helper (native host) receives messages start and stops.
-  - The start will begin to follow the browsers MPRIS bus for status updates (playing,paused,stopped). Anytime the status becomes "Playing" it'll trigger a MPRIS negative seek, which will either move playback to 0 or move playback -5 seconds from the current real position. This seek forces the SPA to update MPRIS.
+- mpris_helper (native host) receives message start and stop.
+  - The start will begin to follow the browser's MPRIS bus for status updates (playing, paused, stopped). Anytime the status becomes "Playing" it'll trigger a MPRIS negative seek, which will either move playback to 0 or move playback -5 seconds from the current real position. This seek forces the SPA to update MPRIS.
   - The stop will stop the native host.
