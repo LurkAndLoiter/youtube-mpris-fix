@@ -2,13 +2,18 @@
 browser=blank
 
 readmsg() {
-  local i n len=0;
-  for ((i=0;i<4;i++)); do
-    read -r -d '' -n 1;
-    printf -v n %d "'$REPLY";
-   ((len+=n<<i*8));
-  done;
-  read -r -N "$len" && msg=$REPLY;
+  local i n char len=0
+  # read and calculate little endian msg length
+  for ((i=0; i<4; i++)); do
+    IFS= read -r -d '' -n 1 char || return 1
+    printf -v n %d "'$char"
+    ((len += n << (i*8)))
+  done
+  # read len of message into msg
+  IFS= read -r -N "$len" msg || return 1
+  # malformed msg check
+  [[ "$msg" == '{"action":"start"}' || "$msg" == '{"action":"stop"}' ]] || return 1
+  return 0
 }
 
 sendmsg() {
@@ -44,6 +49,4 @@ while readmsg; do
       sendmsg '{"status":"ok"}'
       cleanup ;;
   esac
-done
-
-cleanup
+done || cleanup

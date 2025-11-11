@@ -61,7 +61,7 @@ Create a native messaging host call that creates a socket listener for the brows
 2. Navigate to the repositories directory and run the install.sh(see Manual install if you prefer not to run this.).
 
 > **TEMPORARY INSTALL**
-> 
+>
 > 3. In Firefox, navigate to`about:debugging`
 > 4. Click on `This Firefox` on the left
 > 5. Click the `Load Temporary Add-on...` button
@@ -69,14 +69,14 @@ Create a native messaging host call that creates a socket listener for the brows
 > 7. The extension will be active until you close Firefox or disable the extension.
 
 > **PERMANENT INSTALL**
-> 
+>
 > 3. In Firefox, navigate to `about:addons`
 > 4. Click the settings cog wheel `Tools for all add-ons` in the top right.
 > 5. Click "Install Add-on From File"
 > 6. Select the `mpris_youtube_fix.xpi`
 > 7. Click `add` on the pop-up *see note for permissions overview*
 > 8. The extension will be active until you remove or disable it.
- 
+
 > [!NOTE]
 > #### Permissions pop-up
 > - **Exchange messages with programs other than $browser**
