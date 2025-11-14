@@ -23,7 +23,7 @@ sendmsg() {
 }
 
 cleanup() {
-  pgrep -f "playerctl --player=$browser status --follow" | xargs kill
+  pkill -f "playerctl --player=$browser status --follow" 2>/dev/null || true
   exit
 }
 
@@ -38,7 +38,7 @@ while readmsg; do
               Paused|Stopped) continue ;;
               *)
                 # playerctl crashes and ungraceful browser closures
-                pgrep -f "playerctl --player=$browser status --follow" | xargs kill
+                pkill -f "playerctl --player=$browser status --follow" 2>/dev/null || true
                 exit ;;
             esac
           done
