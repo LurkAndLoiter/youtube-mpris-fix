@@ -1,18 +1,27 @@
 {
   "manifest_version": 3,
-  "name": "YouTube MPRIS Patch",
-  "version": "1.1",
-  "description": "MPRIS seeks back 5 seconds when youtube videos start playing. This is bug patch to force an MPRIS data update on youtube player.",
+  "name": "Youtube MPRIS Fix",
+  "version": "2.0",
+  "description": "Force a position seek to currentPosition forcing a MPRIS update on Youtube when a new player loads it's first frame.",
   "icons": {
       "16": "icons/icon16.png",
       "32": "icons/icon32.png",
       "48": "icons/icon48.png",
       "128": "icons/icon128.png"
   },
-  "permissions": ["scripting", "tabs", "nativeMessaging"],
-  "background": { "service_worker": "background.js" },
-  "host_permissions": [
-    "*://*.youtube.com/*",
-    "*://music.youtube.com/*"
-  ]
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "youtube-mpris-fix@lurkandloiter",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  }
 }
