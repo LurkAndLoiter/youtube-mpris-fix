@@ -18,7 +18,7 @@ Tested on:
 
 ## The Problem
 
-YouTube is a Single-Page Application (SPA) that loads new videos dynamically without a full page refresh. Because of this, MPRIS often does not detect video changes and metadata updates. This also fixes firefox based browser position incrememnting when paused.
+YouTube is a Single-Page Application (SPA) that loads new videos dynamically without a full page refresh. Because of this, MPRIS often does not detect video changes and metadata updates. This also fixes firefox based browser position incrementing when paused.
 
 ## Our Solution's Approach
 
