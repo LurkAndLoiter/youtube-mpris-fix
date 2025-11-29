@@ -1,4 +1,4 @@
-# YouTube MPRIS Fix
+# ![icon32](icons/icon32.png) YouTube MPRIS Fix
 
 A browser fix addressing MPRIS metadata bugs on YouTube and YouTube Music
 
